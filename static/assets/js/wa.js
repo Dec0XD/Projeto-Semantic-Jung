@@ -29,15 +29,15 @@ function getCosSim(f1, f2) {
     return dot(f1, f2) / (mag(f1) * mag(f2));
 }
 
-function getNewWord() {
+function getNewWord() {   // pega a palavra e plota no html
     const num = Math.floor(Math.random() * (37146 - 1)) + 1;
     const nova_palavra = SelectWords[num];
     lista_palavras_sonda.push(nova_palavra);
     num_de_palavras += 1;
     getElement('#sonda').innerHTML = nova_palavra;
     time_in = new Date();
-    console.log(num_de_palavras);
-    console.log(nova_palavra);
+    //console.log(num_de_palavras);
+    //console.log(nova_palavra);
     return nova_palavra;
 }
 
@@ -163,7 +163,7 @@ let AssociaPalavra = (function () {
         let resultado = new Resultado(id, getDate(), tempo_de_resposta, sonda,
             respondida, similaridade);
         lista_resultados.push(resultado);
-        console.log(resultado);
+        //console.log(resultado);
         const saveStatus = await saveTest(JSON.stringify(resultado));
         if (saveStatus == 500) {
             return false;
