@@ -4,6 +4,7 @@
  * Cálculo do sorteio baseado em frequência**/
 
 const num_max_de_palavras = 10;
+const total_palavras = 100;
 var num_de_palavras = 0;
 var lista_palavras_sonda = [];
 var lista_resultados = [];
@@ -29,15 +30,15 @@ function getCosSim(f1, f2) {
     return dot(f1, f2) / (mag(f1) * mag(f2));
 }
 
-function getNewWord() {   // pega a palavra e plota no html
-    const num = Math.floor(Math.random() * (37146 - 1)) + 1;
+function getNewWord() {
+    const num = Math.floor(Math.random() * (total_palavras - 1)) + 1;
     const nova_palavra = SelectWords[num];
     lista_palavras_sonda.push(nova_palavra);
     num_de_palavras += 1;
     getElement('#sonda').innerHTML = nova_palavra;
     time_in = new Date();
-    //console.log(num_de_palavras);
-    //console.log(nova_palavra);
+    console.log(num_de_palavras);
+    console.log(nova_palavra);
     return nova_palavra;
 }
 
@@ -129,12 +130,12 @@ let AssociaPalavra = (function () {
 
     async function input(event) {
         event.preventDefault();
-
+    
         time_out = new Date();
-
+    
         getElement("#word-error").style.display = "none";
         getElement('#word').focus();
-
+    
         let palavra_respondida = getElement('#word').value.toLowerCase();
         if (!palavra_respondida) {
             getElement('#word-error').innerHTML = `Digite uma palavra.`;
@@ -142,39 +143,47 @@ let AssociaPalavra = (function () {
             time_in = new Date();
             return false;
         }
-
+    
         getElement('#word').value = "";
         const vetores = await getModel(palavra_sonda, palavra_respondida);
         if (!vetores.vec_2) {
             getElement('#word-error').innerHTML = `A palavra: ${palavra_respondida} não consta no vocabulário.`;
             getElement("#word-error").style.display = "block";
             time_in = new Date();
+            palavra_sonda = getNewWord(); // Pular para a próxima palavra sonda
             return false;
         }
-
+    
         const similaridade = getCosSim(vetores.vec_1, vetores.vec_2);
         loadTest(similaridade, time_out, time_in, palavra_sonda, palavra_respondida);
-
+    
     }
+    
 
     async function loadTest(similaridade, time_out, time_in, sonda, respondida) {
         const id = 0;
         const tempo_de_resposta = time_out.getTime() - time_in.getTime();
-        let resultado = new Resultado(id, getDate(), tempo_de_resposta, sonda,
-            respondida, similaridade);
+        let resultado = new Resultado(id, getDate(), tempo_de_resposta, sonda, respondida, similaridade);
         lista_resultados.push(resultado);
-        //console.log(resultado);
+        console.log(resultado);
         const saveStatus = await saveTest(JSON.stringify(resultado));
         if (saveStatus == 500) {
             return false;
         }
-        if (num_de_palavras == num_max_de_palavras) {
+        if (respondida !== 'NaN') {
+            num_de_palavras += 1; }
+        if (num_de_palavras === num_max_de_palavras) {
             endTest();
-            return false
+            return false;
         }
+       
         palavra_sonda = getNewWord();
+        getElement('#sonda').innerHTML = palavra_sonda;
+        time_in = new Date();
         return true;
     }
+    
+    
 
     function endTest() {
         console.log('end')
