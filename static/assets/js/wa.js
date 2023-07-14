@@ -138,26 +138,34 @@ let AssociaPalavra = (function () {
     
         let palavra_respondida = getElement('#word').value.toLowerCase();
         if (!palavra_respondida) {
-            getElement('#word-error').innerHTML = `Digite uma palavra.`;
-            getElement("#word-error").style.display = "block";
-            time_in = new Date();
-            return false;
+          getElement('#word-error').innerHTML = `Digite uma palavra.`;
+          getElement("#word-error").style.display = "block";
+          time_in = new Date();
+          return false;
         }
     
         getElement('#word').value = "";
         const vetores = await getModel(palavra_sonda, palavra_respondida);
         if (!vetores.vec_2) {
-            getElement('#word-error').innerHTML = `A palavra: ${palavra_respondida} não consta no vocabulário.`;
-            getElement("#word-error").style.display = "block";
-            time_in = new Date();
+          getElement('#word-error').innerHTML = `A palavra: ${palavra_respondida} não consta no vocabulário. E nova palavra em 2 segundos`;
+          getElement("#word-error").style.display = "block";
+          getElement('#sonda').classList.add('erro'); // Adiciona a classe 'erro' à palavra sonda
+          time_in = new Date();
+          setTimeout(() => {
+            getElement('#sonda').classList.remove('erro'); // Remove a classe 'erro' após 2 segundos
             palavra_sonda = getNewWord(); // Pular para a próxima palavra sonda
-            return false;
+            getElement('#sonda').innerHTML = palavra_sonda;
+            time_in = new Date();
+            getElement("#word-error").style.display = "none"; // Remove a mensagem de erro
+          }, 2000); // 2 segundos de atraso
+          return false;
         }
     
         const similaridade = getCosSim(vetores.vec_1, vetores.vec_2);
         loadTest(similaridade, time_out, time_in, palavra_sonda, palavra_respondida);
+      }
     
-    }
+      
     
 
     async function loadTest(similaridade, time_out, time_in, sonda, respondida) {
